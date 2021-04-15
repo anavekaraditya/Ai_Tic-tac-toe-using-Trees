@@ -1,5 +1,11 @@
 #include<stdio.h>
 
+struct tree{
+    char b[3][3];
+    struct tree *right;
+    struct tree *left;
+};
+
 void displayBoard(char board[3][3]){
     printf("     |     |     \n");
     printf("  %c  |  %c  |  %c \n",board[0][0],board[0][1],board[0][2]);
@@ -23,7 +29,7 @@ int validMove(char board[3][3],int x,int y){
         return 0;
 }
 int checkResult(char state[3][3]){
-    char win_state = {
+    char win_state[9][3] = {
         {state[0][0], state[0][1], state[0][2]},
         {state[1][0], state[1][1], state[1][2]},
         {state[2][0], state[2][1], state[2][2]},
@@ -33,7 +39,20 @@ int checkResult(char state[3][3]){
         {state[0][0], state[1][1], state[2][2]},
         {state[2][0], state[1][1], state[0][2]},
     };
-    return 0;
+    for(int i=0;i<9;i++){
+        if(win_state[i][0]==win_state[i][1] && win_state[i][1]==win_state[i][2] ){
+                if(win_state[i][2]=='X'){
+                    printf("Game Over Computer wins\n");
+                    return 9;
+                }
+                else if(win_state[i][2]=='O'){
+                    printf("Game Over Human wins\n");
+                    return 9;
+                }
+                else
+                    return 0;
+        }
+    }
 }
 void main(){
     int x;
@@ -42,7 +61,7 @@ void main(){
     int count=1;
     int n;
     clearBoard(board);
-    while(count!=9){
+    while(count<=9){
         printf("enter the no.:");
         scanf("%d",&n);
         if(validMove(board,moves[n-1][0],moves[n-1][1]))
@@ -54,5 +73,6 @@ void main(){
             count++;
             displayBoard(board);
         }
+        count=count+checkResult(board);
     }
 }
