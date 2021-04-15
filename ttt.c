@@ -1,0 +1,45 @@
+#include<stdio.h>
+
+void displayBoard(char board[3][3]){
+    printf("     |     |     \n");
+    printf("  %c  |  %c  |  %c \n",board[0][0],board[0][1],board[0][2]);
+    printf("_____|_____|_____\n");
+    printf("     |     |     \n");
+    printf("  %c  |  %c  |  %c \n",board[1][0],board[1][1],board[1][2]);
+    printf("_____|_____|_____\n");
+    printf("     |     |     \n");
+    printf("  %c  |  %c  |  %c \n",board[2][0],board[2][1],board[2][2]);
+    printf("     |     |     \n");
+}
+void clearBoard(char board[3][3]){
+    for(int i=0;i<3;i++)
+        for(int j=0;j<3;j++)
+            board[i][j]=' ';
+}
+int validMove(char board[3][3],int x,int y){
+    if(board[x][y]==' ')
+        return 1;
+    else
+        return 0;
+}
+void main(){
+    int x;
+    char board[3][3];
+    int moves[9][2]={{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2}};
+    int count=1;
+    int n;
+    clearBoard(board);
+    while(count!=9){
+        printf("enter the no.:");
+        scanf("%d",&n);
+        if(validMove(board,moves[n-1][0],moves[n-1][1]))
+        {
+            if(count%2==0)
+                board[moves[n-1][0]][moves[n-1][1]]='X';
+            else
+                board[moves[n-1][0]][moves[n-1][1]]='O';
+            count++;
+            displayBoard(board);
+        }
+    }
+}
