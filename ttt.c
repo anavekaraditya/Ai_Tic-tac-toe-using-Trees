@@ -57,11 +57,15 @@ int checkResult(char state[3][3]){
 void main(){
     int x;
     char board[3][3];
+    char board2[3][3];
     int moves[9][2]={{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2}};
     int count=1;
     int n;
     clearBoard(board);
+    clearBoard(board2);
     while(count<=9){
+        if(board==board2)
+            printf("Yes");
         printf("enter the no.:");
         scanf("%d",&n);
         if(validMove(board,moves[n-1][0],moves[n-1][1]))
@@ -73,6 +77,8 @@ void main(){
             count++;
             displayBoard(board);
         }
+        if(board==board2)
+            printf("Yes");
         count=count+checkResult(board);
     }
 }
