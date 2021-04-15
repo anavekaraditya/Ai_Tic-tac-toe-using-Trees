@@ -26,6 +26,7 @@ int validMove(char board[3][3],int x,int y){
     if(board[x][y]==' ')
         return 1;
     else
+        printf("Invalid Move, Try another position.\n");
         return 0;
 }
 int checkResult(char state[3][3]){
@@ -66,7 +67,7 @@ void main(){
     while(count<=9){
         if(board==board2)
             printf("Yes");
-        printf("enter the no.:");
+        printf("Enter the no.:");
         scanf("%d",&n);
         if(validMove(board,moves[n-1][0],moves[n-1][1]))
         {
