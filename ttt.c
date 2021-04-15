@@ -22,6 +22,19 @@ int validMove(char board[3][3],int x,int y){
     else
         return 0;
 }
+int checkResult(char state[3][3]){
+    char win_state = {
+        {state[0][0], state[0][1], state[0][2]},
+        {state[1][0], state[1][1], state[1][2]},
+        {state[2][0], state[2][1], state[2][2]},
+        {state[0][0], state[1][0], state[2][0]},
+        {state[0][1], state[1][1], state[2][1]},
+        {state[0][2], state[1][2], state[2][2]},
+        {state[0][0], state[1][1], state[2][2]},
+        {state[2][0], state[1][1], state[0][2]},
+    };
+    return 0;
+}
 void main(){
     int x;
     char board[3][3];
