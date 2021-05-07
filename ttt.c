@@ -14,7 +14,7 @@ struct Move
     int row, col;
 };
 
-char player = 'O', opponent = 'X';
+char human = 'X', computer = 'O';
 
 void displayBoard(char board[3][3]){
     printf("     |     |     \n");
@@ -53,11 +53,11 @@ int checkResult(char state[3][3]){
     for(int i=0;i<9;i++){
         if(win_state[i][0]==win_state[i][1] && win_state[i][1]==win_state[i][2] ){
                 if(win_state[i][2]=='X'){
-                    printf("Game Over Computer wins\n");
+                    printf("Game Over Human wins\n");
                     return 9;
                 }
                 else if(win_state[i][2]=='O'){
-                    printf("Game Over Human wins\n");
+                    printf("Game Over Computer wins\n");
                     return 9;
                 }
                 else
@@ -81,9 +81,9 @@ int evaluate(char b[3][3])
         if (b[row][0]==b[row][1] &&
             b[row][1]==b[row][2])
         {
-            if (b[row][0]==player)
+            if (b[row][0]==computer)
                 return +10;
-            else if (b[row][0]==opponent)
+            else if (b[row][0]==human)
                 return -10;
         }
     }
@@ -94,10 +94,10 @@ int evaluate(char b[3][3])
         if (b[0][col]==b[1][col] &&
             b[1][col]==b[2][col])
         {
-            if (b[0][col]==player)
+            if (b[0][col]==computer)
                 return +10;
 
-            else if (b[0][col]==opponent)
+            else if (b[0][col]==human)
                 return -10;
         }
     }
@@ -105,17 +105,17 @@ int evaluate(char b[3][3])
     // Checking for Diagonals for X or O victory.
     if (b[0][0]==b[1][1] && b[1][1]==b[2][2])
     {
-        if (b[0][0]==player)
+        if (b[0][0]==computer)
             return +10;
-        else if (b[0][0]==opponent)
+        else if (b[0][0]==human)
             return -10;
     }
 
     if (b[0][2]==b[1][1] && b[1][1]==b[2][0])
     {
-        if (b[0][2]==player)
+        if (b[0][2]==computer)
             return +10;
-        else if (b[0][2]==opponent)
+        else if (b[0][2]==human)
             return -10;
     }
 
@@ -152,18 +152,17 @@ int minimax(char board[3][3], int depth, bool isMax)
             for (int j = 0; j<3; j++)
             {
                 // Check if cell is empty
-                if (board[i][j]=='_')
+                if (board[i][j]==' ')
                 {
                     // Make the move
-                    board[i][j] = player;
+                    board[i][j] = computer;
 
                     // Call minimax recursively and choose
                     // the maximum value
-                    best = max( best,
-                        minimax(board, depth+1, !isMax) );
+                    best = max( best, minimax(board, depth+1, !isMax) );
 
                     // Undo the move
-                    board[i][j] = '_';
+                    board[i][j] = ' ';
                 }
             }
         }
@@ -181,17 +180,17 @@ int minimax(char board[3][3], int depth, bool isMax)
             for (int j = 0; j<3; j++)
             {
                 // Check if cell is empty
-                if (board[i][j]=='_')
+                if (board[i][j]==' ')
                 {
                     // Make the move
-                    board[i][j] = opponent;
+                    board[i][j] = human;
 
                     // Call minimax recursively and choose
                     // the minimum value
                     best = min(best,minimax(board, depth+1, !isMax));
 
                     // Undo the move
-                    board[i][j] = '_';
+                    board[i][j] = ' ';
                 }
             }
         }
@@ -215,17 +214,17 @@ struct Move findBestMove(char board[3][3])
         for (int j = 0; j<3; j++)
         {
             // Check if cell is empty
-            if (board[i][j]=='_')
+            if (board[i][j]==' ')
             {
                 // Make the move
-                board[i][j] = player;
+                board[i][j] = computer;
 
                 // compute evaluation function for this
                 // move.
                 int moveVal = minimax(board, 0, false);
 
                 // Undo the move
-                board[i][j] = '_';
+                board[i][j] = ' ';
 
                 // If the value of the current move is
                 // more than the best value, then update
@@ -265,6 +264,8 @@ void main(){
         }
         struct Move bestMove = findBestMove(board);
         printf("The best Move is : %d %d\n\n",bestMove.row,bestMove.col);
+        board[bestMove.row][bestMove.col]='O';
+        displayBoard(board);
         if(board==board2)
             printf("Yes");
         count=count+checkResult(board);
