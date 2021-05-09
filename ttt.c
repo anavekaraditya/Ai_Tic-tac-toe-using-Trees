@@ -1,13 +1,14 @@
 #include<stdio.h>
 #include <stdbool.h>
+#include<stdlib.h>
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
-struct tree{
+typedef struct tree{
     char b[3][3];
     struct tree *right;
     struct tree *left;
-};
+}Tree;
 
 struct Move
 {
@@ -15,6 +16,45 @@ struct Move
 };
 
 char human = 'X', computer = 'O';
+int flag2=1;
+
+Tree *root=NULL, *traverse = NULL, *traverse2=NULL, *traverse3=NULL;
+
+Tree* AddNode(char board[3][3]){
+    Tree *newchild =(Tree*) malloc (sizeof(Tree));
+    newchild->left = newchild->right = NULL;
+    for(int i=0;i<3;i++)
+        for(int j=0;j<3;j++)
+            newchild->b[i][j]=board[i][j];
+    if(traverse2->left == NULL)
+        traverse2->left= newchild;
+    else
+        traverse3->right = newchild;
+    return newchild;
+}
+
+Tree* TreeSearch(char board[3][3]){
+    traverse3 = traverse;
+    traverse2 = traverse;
+    traverse=traverse->left;
+    while(traverse!=NULL){
+        int flag=0;
+        for(int i=0;i<3;i++)
+            for(int j=0;j<3;j++)
+                if(traverse->b[i][j]!=board[i][j])
+                    flag=1;
+        if(flag==0)
+            return traverse->left;
+        else
+        {
+            traverse3 = traverse;
+            traverse=traverse->right;
+        }
+    }
+    AddNode(board);
+    return NULL;
+}
+
 
 void displayBoard(char board[3][3]){
     printf("     |     |     \n");
@@ -39,7 +79,7 @@ int validMove(char board[3][3],int x,int y){
         printf("Invalid Move, Try another position.\n");
         return 0;
 }
-int checkResult(char state[3][3]){
+void checkResult(char state[3][3]){
     char win_state[9][3] = {
         {state[0][0], state[0][1], state[0][2]},
         {state[1][0], state[1][1], state[1][2]},
@@ -52,16 +92,14 @@ int checkResult(char state[3][3]){
     };
     for(int i=0;i<9;i++){
         if(win_state[i][0]==win_state[i][1] && win_state[i][1]==win_state[i][2] ){
-                if(win_state[i][2]=='X'){
+                if(win_state[i][2]==human){
                     printf("Game Over Human wins\n");
-                    return 9;
+                    exit(0);
                 }
-                else if(win_state[i][2]=='O'){
+                else if(win_state[i][2]==computer){
                     printf("Game Over Computer wins\n");
-                    return 9;
+                    exit(0);
                 }
-                else
-                    return 0;
         }
     }
 }
@@ -69,7 +107,7 @@ bool isMovesLeft(char board[3][3])
 {
     for (int i = 0; i<3; i++)
         for (int j = 0; j<3; j++)
-            if (board[i][j]=='_')
+            if (board[i][j]==' ')
                 return true;
     return false;
 }
@@ -238,36 +276,38 @@ struct Move findBestMove(char board[3][3])
             }
         }
     }
-
-    printf("The value of the best Move is : %d\n\n",
-            bestVal);
     return bestMove;
 }
 void main(){
+    root = (Tree*) malloc (sizeof(Tree));
+    traverse = (Tree*) malloc (sizeof(Tree));
+    for(int i=0;i<3;i++)
+        for(int j=0;j<3;j++)
+            root->b[i][j]=' ';
     int x;
     char board[3][3];
-    char board2[3][3];
     int moves[9][2]={{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2}};
     int count=1;
     int n;
     clearBoard(board);
-    clearBoard(board2);
+    printf("Welcome to the Unbeatable TIC TAC TOE Game....\nTry your luck and try to beat the Computer...\n\n");
     while(count<=9){
-        if(board==board2)
-            printf("Yes");
         printf("Enter the no.:");
         scanf("%d",&n);
         if(validMove(board,moves[n-1][0],moves[n-1][1]))
         {
-            board[moves[n-1][0]][moves[n-1][1]]='X';
+            board[moves[n-1][0]][moves[n-1][1]]=human;
             displayBoard(board);
+            printf("\n\n");
+            count=count+1;
+            checkResult(board);
+            root=TreeSearch(board);
+            struct Move bestMove = findBestMove(board);
+            board[bestMove.row][bestMove.col]=computer;
+            displayBoard(board);
+            count=count+1;
+            checkResult(board);
         }
-        struct Move bestMove = findBestMove(board);
-        printf("The best Move is : %d %d\n\n",bestMove.row,bestMove.col);
-        board[bestMove.row][bestMove.col]='O';
-        displayBoard(board);
-        if(board==board2)
-            printf("Yes");
-        count=count+checkResult(board);
     }
+    printf("Game Over Its a Draw\n");
 }
