@@ -1,14 +1,9 @@
 #include<stdio.h>
 #include <stdbool.h>
 #include<stdlib.h>
+#include<time.h>
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define min(x, y) (((x) < (y)) ? (x) : (y))
-
-typedef struct tree{
-    char b[3][3];
-    struct tree *right;
-    struct tree *left;
-}Tree;
 
 struct Move
 {
@@ -19,51 +14,7 @@ char human = 'X', computer = 'O';
 int ply=0;
 int com=0;
 int draw=0;
-
-Tree *root=NULL, *traverse = NULL, *traverse2=NULL, *traverse3=NULL;
-
-int AddNode(char board[3][3]){
-    Tree *newchild =(Tree*) malloc (sizeof(Tree));
-    newchild->left = newchild->right = NULL;
-    for(int i=0;i<3;i++)
-        for(int j=0;j<3;j++)
-            newchild->b[i][j]=board[i][j];
-    if(traverse2->left == NULL){
-        traverse2->left= newchild;
-        traverse = newchild;
-        printf("Added at the start");
-    }
-    else{
-        traverse3->right = newchild;
-        traverse = newchild;
-        printf("Added at the end");
-    }
-    return 0;
-}
-
-int TreeSearch(char board[3][3]){
-    traverse3 = traverse;
-    traverse2 = traverse;
-    traverse=traverse->left;
-    while(traverse!=NULL){
-        int flag=0;
-        for(int i=0;i<3;i++)
-            for(int j=0;j<3;j++)
-                if(traverse->b[i][j]!=board[i][j])
-                    flag=1;
-        if(flag==0){
-            traverse->left;
-            return 1;
-        }
-        else
-        {
-            traverse3 = traverse;
-            traverse=traverse->right;
-        }
-    }
-    return AddNode(board);
-}
-
+double t;
 
 void displayBoard(char board[3][3]){
     printf("     |     |     \n");
@@ -217,7 +168,6 @@ int minimax(char board[3][3], int depth, bool isMax)
         }
         return best;
     }
-
     // If this minimizer's move
     else
     {
@@ -290,17 +240,11 @@ struct Move findBestMove(char board[3][3])
     return bestMove;
 }
 void main(){
-    root = (Tree*) malloc (sizeof(Tree));
-    for(int i=0;i<3;i++)
-        for(int j=0;j<3;j++)
-            root->b[i][j]=' ';
-    root->left=NULL;
-    root->right=NULL;
     int x;
     char board[3][3];
     int moves[9][2]={{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2}};
     int count=1;
-    int n,choice;
+    int n,m,choice;
     printf("Welcome to the Unbeatable TIC TAC TOE Game....\nTry your luck and try to beat the Computer...\n\n");
     while(1){
         printf("1]New Game\n2]Exit\n\n");
@@ -308,9 +252,9 @@ void main(){
         scanf("%d",&choice);
         switch(choice){
             case 1:
+                t=0.0;
                 clearBoard(board);
                 count=1;
-                traverse = root;
                 while(count<=9){
                     printf("Enter the no.:");
                     scanf("%d",&n);
@@ -322,22 +266,15 @@ void main(){
                         count=count+1;
                         if(!checkResult(board))
                            break;
-                        n=TreeSearch(board);
-                        if(n==1){
-                            printf("Enter the no.:");
-                            for(int i=0;i<3;i++)
-                                for(int j=0;j<3;j++)
-                                    board[i][j]=traverse->b[i][j];
-                        }
-                        else{
-                            struct Move bestMove = findBestMove(board);
-                            board[bestMove.row][bestMove.col]=computer;
-                            //traverse=traverse->left;
-                            memcpy(traverse->b,board,sizeof board);
-                            /*for(int i=0;i<3;i++)
-                                for(int j=0;j<3;j++)
-                                    traverse->b[i][j]=board[i][j];*/
-                        }
+                        clock_t begin = clock();
+                        printf("start time: %lf\n",begin);
+                        printf("Using MinMax\n");
+                        struct Move bestMove = findBestMove(board);
+                        board[bestMove.row][bestMove.col]=computer;
+                        clock_t end = clock();
+                        printf("end time: %lf\n",begin);
+                        t += (double)(end - begin) / CLOCKS_PER_SEC;
+                        printf("total tiem: %lf\n",t);
                         displayBoard(board);
                         count=count+1;
                         if(!checkResult(board))
@@ -357,7 +294,8 @@ void main(){
         printf("Score Board:\n\n");
         printf("Computer: %d\n",com);
         printf("Human: %d\n",ply);
-        printf("Draw: %d\n\n\n",draw);
+        printf("Draw: %d\n\n",draw);
+        printf("Time: %f\n\n\n",t);
     }
 
 }
