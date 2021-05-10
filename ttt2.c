@@ -313,7 +313,6 @@ void main(){
                 clearBoard(board);
                 count=1;
                 traverse = root;
-                displayBoard(traverse->b);
                 while(count<=9){
                     printf("Enter the no.:");
                     scanf("%d",&n);
