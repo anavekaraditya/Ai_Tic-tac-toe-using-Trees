@@ -16,24 +16,32 @@ struct Move
 };
 
 char human = 'X', computer = 'O';
-int flag2=1;
+int ply=0;
+int com=0;
+int draw=0;
 
 Tree *root=NULL, *traverse = NULL, *traverse2=NULL, *traverse3=NULL;
 
-Tree* AddNode(char board[3][3]){
+int AddNode(char board[3][3]){
     Tree *newchild =(Tree*) malloc (sizeof(Tree));
     newchild->left = newchild->right = NULL;
     for(int i=0;i<3;i++)
         for(int j=0;j<3;j++)
             newchild->b[i][j]=board[i][j];
-    if(traverse2->left == NULL)
+    if(traverse2->left == NULL){
         traverse2->left= newchild;
-    else
+        traverse = newchild;
+        printf("Added at the start");
+    }
+    else{
         traverse3->right = newchild;
-    return newchild;
+        traverse = newchild;
+        printf("Added at the end");
+    }
+    return 0;
 }
 
-Tree* TreeSearch(char board[3][3]){
+int TreeSearch(char board[3][3]){
     traverse3 = traverse;
     traverse2 = traverse;
     traverse=traverse->left;
@@ -43,16 +51,17 @@ Tree* TreeSearch(char board[3][3]){
             for(int j=0;j<3;j++)
                 if(traverse->b[i][j]!=board[i][j])
                     flag=1;
-        if(flag==0)
-            return traverse->left;
+        if(flag==0){
+            traverse->left;
+            return 1;
+        }
         else
         {
             traverse3 = traverse;
             traverse=traverse->right;
         }
     }
-    AddNode(board);
-    return NULL;
+    return AddNode(board);
 }
 
 
@@ -79,7 +88,7 @@ int validMove(char board[3][3],int x,int y){
         printf("Invalid Move, Try another position.\n");
         return 0;
 }
-void checkResult(char state[3][3]){
+int checkResult(char state[3][3]){
     char win_state[9][3] = {
         {state[0][0], state[0][1], state[0][2]},
         {state[1][0], state[1][1], state[1][2]},
@@ -94,11 +103,13 @@ void checkResult(char state[3][3]){
         if(win_state[i][0]==win_state[i][1] && win_state[i][1]==win_state[i][2] ){
                 if(win_state[i][2]==human){
                     printf("Game Over Human wins\n");
-                    exit(0);
+                    ply++;
+                    return 0;
                 }
                 else if(win_state[i][2]==computer){
                     printf("Game Over Computer wins\n");
-                    exit(0);
+                    com++;
+                    return 0;
                 }
         }
     }
@@ -280,34 +291,73 @@ struct Move findBestMove(char board[3][3])
 }
 void main(){
     root = (Tree*) malloc (sizeof(Tree));
-    traverse = (Tree*) malloc (sizeof(Tree));
     for(int i=0;i<3;i++)
         for(int j=0;j<3;j++)
             root->b[i][j]=' ';
+    root->left=NULL;
+    root->right=NULL;
     int x;
     char board[3][3];
     int moves[9][2]={{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2}};
     int count=1;
-    int n;
-    clearBoard(board);
+    int n,choice;
     printf("Welcome to the Unbeatable TIC TAC TOE Game....\nTry your luck and try to beat the Computer...\n\n");
-    while(count<=9){
-        printf("Enter the no.:");
-        scanf("%d",&n);
-        if(validMove(board,moves[n-1][0],moves[n-1][1]))
-        {
-            board[moves[n-1][0]][moves[n-1][1]]=human;
-            displayBoard(board);
-            printf("\n\n");
-            count=count+1;
-            checkResult(board);
-            root=TreeSearch(board);
-            struct Move bestMove = findBestMove(board);
-            board[bestMove.row][bestMove.col]=computer;
-            displayBoard(board);
-            count=count+1;
-            checkResult(board);
+    while(1){
+        printf("1]New Game\n2]Exit\n\n");
+        printf("Enter your choice:\n");
+        scanf("%d",&choice);
+        switch(choice){
+            case 1:
+                clearBoard(board);
+                count=1;
+                traverse = root;
+                while(count<=9){
+                    printf("Enter the no.:");
+                    scanf("%d",&n);
+                    if(validMove(board,moves[n-1][0],moves[n-1][1]))
+                    {
+                        board[moves[n-1][0]][moves[n-1][1]]=human;
+                        displayBoard(board);
+                        printf("\n\n");
+                        count=count+1;
+                        if(!checkResult(board))
+                           break;
+                        n=TreeSearch(board);
+                        if(n==1){
+                            printf("Enter the no.:");
+                            for(int i=0;i<3;i++)
+                                for(int j=0;j<3;j++)
+                                    board[i][j]=traverse->b[i][j];
+                        }
+                        else{
+                            struct Move bestMove = findBestMove(board);
+                            board[bestMove.row][bestMove.col]=computer;
+                            //traverse=traverse->left;
+                            memcpy(traverse->b,board,sizeof board);
+                            /*for(int i=0;i<3;i++)
+                                for(int j=0;j<3;j++)
+                                    traverse->b[i][j]=board[i][j];*/
+                        }
+                        displayBoard(board);
+                        count=count+1;
+                        if(!checkResult(board))
+                           break;
+                    }
+                }
+                if(!isMovesLeft(board)){
+                    draw++;
+                    printf("Game Over Its a Draw\n\n\n");
+                }
+                break;
+            case 2:
+                exit(0);
+            default:
+                printf("\nEnter valid choice.\n");
         }
+        printf("Score Board:\n\n");
+        printf("Computer: %d\n",com);
+        printf("Human: %d\n",ply);
+        printf("Draw: %d\n\n\n",draw);
     }
-    printf("Game Over Its a Draw\n");
+
 }
