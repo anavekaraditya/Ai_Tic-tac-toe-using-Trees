@@ -14,7 +14,7 @@ char human = 'X', computer = 'O';
 int ply=0;
 int com=0;
 int draw=0;
-double t;
+
 
 void displayBoard(char board[3][3]){
     printf("     |     |     \n");
@@ -243,40 +243,46 @@ void main(){
     int x;
     char board[3][3];
     int moves[9][2]={{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2}};
-    int count=1;
-    int n,m,choice,a;
+    int count=1,gameCount=0;
+    int n,m,choice;
+    double t[100][2];
+    FILE* file = fopen ("test1.txt", "r");
+    FILE* o_file = fopen ("output1.txt", "w");
     printf("Welcome to the Unbeatable TIC TAC TOE Game....\nTry your luck and try to beat the Computer...\n\n");
     while(1){
-        printf("1]New Game\n2]Exit\n\n");
-        printf("Enter your choice:\n");
-        scanf("%d",&choice);
+        gameCount++;
+        t[gameCount][0]=gameCount;
+        //printf("1]New Game\n2]Exit\n\n");
+        //printf("Enter your choice:\n");
+        fscanf (file, "%d", &choice);
         switch(choice){
             case 1:
-                t=0.0;
+                t[gameCount][1]=0.0;
                 clearBoard(board);
                 count=1;
+                printf("Game %d:\n",gameCount);
                 while(count<=9){
-                    printf("Enter the no.:");
-                    scanf("%d",&n);
+                    //printf("Enter the no.:");
+                    fscanf (file, "%d", &n);
                     if(validMove(board,moves[n-1][0],moves[n-1][1]))
                     {
                         board[moves[n-1][0]][moves[n-1][1]]=human;
-                        printf("\n");
-                        displayBoard(board);
-                        printf("\n\n");
+                        //printf("\n");
+                        //displayBoard(board);
+                        //printf("\n\n");
                         count=count+1;
                         if(!checkResult(board))
                            break;
                         clock_t begin = clock();
-                        printf("start time: %lf\n",begin);
-                        printf("Using MinMax\n");
+                        //printf("start time: %lf\n",begin);
+                        //printf("Using MinMax\n");
                         struct Move bestMove = findBestMove(board);
                         board[bestMove.row][bestMove.col]=computer;
                         clock_t end = clock();
-                        printf("end time: %lf\n",begin);
-                        t += (double)(end - begin) / CLOCKS_PER_SEC;
-                        printf("total tiem: %lf\n",t);
-                        displayBoard(board);
+                        //printf("end time: %lf\n",begin);
+                        t[gameCount][1] += (double)(end - begin) / CLOCKS_PER_SEC;
+                        //printf("total tiem: %lf\n",t);
+                        //displayBoard(board);
                         count=count+1;
                         if(!checkResult(board))
                            break;
@@ -284,19 +290,26 @@ void main(){
                 }
                 if(!isMovesLeft(board)){
                     draw++;
-                    printf("Game Over Its a Draw\n\n\n");
+                    printf("Game Over Its a Draw\n");
                 }
                 break;
             case 2:
+                for(int i=1;i<gameCount;i++){
+                    fprintf(o_file,"%.f ",t[i][0]);
+                    fprintf(o_file,"%f\n",t[i][1]);
+                    printf("\nGame %.f:\n",t[i][0]);
+                    printf("Time of Game %d: %f\n\n",i,t[i][1]);
+                }
+                printf("Score Board:\n");
+                printf("Computer: %d\n",com);
+                printf("Human: %d\n",ply);
+                printf("Draw: %d\n\n",draw);
                 exit(0);
             default:
                 printf("\nEnter valid choice.\n");
         }
-        printf("Score Board:\n\n");
-        printf("Computer: %d\n",com);
-        printf("Human: %d\n",ply);
-        printf("Draw: %d\n\n",draw);
-        printf("Time: %f\n\n\n",t);
     }
+
+
 
 }
