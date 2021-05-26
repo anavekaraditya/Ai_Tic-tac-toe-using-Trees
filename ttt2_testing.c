@@ -6,6 +6,13 @@
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
+typedef struct tree{
+    char b[3][3];
+    char s[3][3];
+    struct tree *right;
+    struct tree *left;
+}Tree;
+
 struct Move
 {
     int row, col;
@@ -15,6 +22,50 @@ char human = 'X', computer = 'O';
 int ply=0;
 int com=0;
 int draw=0;
+
+
+Tree *root=NULL, *traverse = NULL, *traverse2=NULL, *traverse3=NULL;
+
+int AddNode(char board[3][3]){
+    Tree *newchild =(Tree*) malloc (sizeof(Tree));
+    newchild->left = newchild->right = NULL;
+    for(int i=0;i<3;i++)
+        for(int j=0;j<3;j++)
+            newchild->b[i][j]=board[i][j];
+    if(traverse2->left == NULL){
+        traverse2->left= newchild;
+        traverse = newchild;
+        //printf("Added at the start\n");
+    }
+    else{
+        traverse3->right = newchild;
+        traverse = newchild;
+        //printf("Added at the end\n");
+    }
+    return 0;
+}
+
+int TreeSearch(char board[3][3]){
+    traverse3 = traverse;
+    traverse2 = traverse;
+    traverse=traverse->left;
+    while(traverse!=NULL){
+        int flag=0;
+        for(int i=0;i<3;i++)
+            for(int j=0;j<3;j++)
+                if(traverse->b[i][j]!=board[i][j])
+                    flag=1;
+        if(flag==0){
+            return 1;
+        }
+        else
+        {
+            traverse3 = traverse;
+            traverse=traverse->right;
+        }
+    }
+    return AddNode(board);
+}
 
 
 void displayBoard(char board[3][3]){
@@ -54,12 +105,12 @@ int checkResult(char state[3][3]){
     for(int i=0;i<9;i++){
         if(win_state[i][0]==win_state[i][1] && win_state[i][1]==win_state[i][2] ){
                 if(win_state[i][2]==human){
-                    printf("Game Over Human wins\n");
+                    //printf("Game Over Human wins\n");
                     ply++;
                     return 0;
                 }
                 else if(win_state[i][2]==computer){
-                    printf("Game Over Computer wins\n");
+                    //printf("Game Over Computer wins\n");
                     com++;
                     return 0;
                 }
@@ -241,6 +292,12 @@ struct Move findBestMove(char board[3][3])
     return bestMove;
 }
 void main(){
+    root = (Tree*) malloc (sizeof(Tree));
+    for(int i=0;i<3;i++)
+        for(int j=0;j<3;j++)
+            root->b[i][j]=' ';
+    root->left=NULL;
+    root->right=NULL;
     int x;
     char board[3][3];
     int moves[9][2]={{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2}};
@@ -248,43 +305,57 @@ void main(){
     int n,m,choice;
     double t[100][2],start,finish;
     FILE* file = fopen ("test1.txt", "r");
-    FILE* o_file = fopen ("output1.txt", "w");
+    FILE* o_file = fopen ("output2.txt", "w");
     printf("Welcome to the Unbeatable TIC TAC TOE Game....\nTry your luck and try to beat the Computer...\n\n");
     while(1){
         gameCount++;
-        t[gameCount][0]=gameCount;
+        t[gameCount][0]= gameCount;
         //printf("1]New Game\n2]Exit\n\n");
         //printf("Enter your choice:\n");
+        //sleep(1);
+        //scanf("%d",&choice);
         fscanf (file, "%d", &choice);
+        //printf("%d ",choice);
         switch(choice){
             case 1:
-                t[gameCount][1]=0.0;
+                t[gameCount][1] = 0.00000;
                 clearBoard(board);
                 count=1;
-                printf("Game %d:\n",gameCount);
+                traverse = root;
                 while(count<=9){
                     //printf("Enter the no.:");
+                    //scanf("%d",&choice);
                     fscanf (file, "%d", &n);
+                    //printf("%d ",n);
                     if(validMove(board,moves[n-1][0],moves[n-1][1]))
                     {
                         board[moves[n-1][0]][moves[n-1][1]]=human;
-                        //printf("\n");
                         //displayBoard(board);
                         //printf("\n\n");
                         count=count+1;
-                        if(!checkResult(board))
-                           break;
+                        /*if(!checkResult(board))
+                        {printf("HI");
+                           break;}*/
                         clock_t begin = clock();
                         start=(double) begin / CLOCKS_PER_SEC;
                         sleep(1);
                         //printf("start time: %lf\n",begin);
-                        //printf("Using MinMax\n");
-                        struct Move bestMove = findBestMove(board);
-                        board[bestMove.row][bestMove.col]=computer;
+                        m=TreeSearch(board);
+                        if(m==1){
+                            //printf("Using Tree\n");
+                            memcpy(board,traverse->s,sizeof board);
+                        }
+                        else{
+                            //printf("Using MinMax\n");
+                            struct Move bestMove = findBestMove(board);
+                            board[bestMove.row][bestMove.col]=computer;
+                            memcpy(traverse->s,board,sizeof board);
+                        }
                         clock_t end = clock();
                         finish=(double) end / CLOCKS_PER_SEC;
                         //printf("end time: %lf\n",begin);
                         t[gameCount][1] += finish-start-1;
+                        //t[gameCount][1] += ((double)(end - begin)) / CLOCKS_PER_SEC;
                         //printf("total tiem: %lf\n",t);
                         //displayBoard(board);
                         count=count+1;
@@ -294,7 +365,7 @@ void main(){
                 }
                 if(!isMovesLeft(board)){
                     draw++;
-                    printf("Game Over Its a Draw\n");
+                    //printf("Game Over Its a Draw\n");
                 }
                 break;
             case 2:
@@ -304,7 +375,7 @@ void main(){
                     printf("\nGame %.f:\n",t[i][0]);
                     printf("Time of Game %d: %f\n\n",i,t[i][1]);
                 }
-                printf("Score Board:\n");
+                printf("Score Board:\n\n");
                 printf("Computer: %d\n",com);
                 printf("Human: %d\n",ply);
                 printf("Draw: %d\n\n",draw);
@@ -312,8 +383,7 @@ void main(){
             default:
                 printf("\nEnter valid choice.\n");
         }
+
     }
-
-
 
 }

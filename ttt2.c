@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include<stdlib.h>
 #include<time.h>
+#include<unistd.h>
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
@@ -21,7 +22,6 @@ char human = 'X', computer = 'O';
 int ply=0;
 int com=0;
 int draw=0;
-double t;
 
 Tree *root=NULL, *traverse = NULL, *traverse2=NULL, *traverse3=NULL;
 
@@ -298,6 +298,7 @@ void main(){
     root->left=NULL;
     root->right=NULL;
     int x;
+    double t,start,finish;
     char board[3][3];
     int moves[9][2]={{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2}};
     int count=1;
@@ -309,7 +310,7 @@ void main(){
         scanf("%d",&choice);
         switch(choice){
             case 1:
-                t=0.0;
+                t = 0.0;
                 clearBoard(board);
                 count=1;
                 traverse = root;
@@ -319,13 +320,15 @@ void main(){
                     if(validMove(board,moves[n-1][0],moves[n-1][1]))
                     {
                         board[moves[n-1][0]][moves[n-1][1]]=human;
-                        displayBoard(board);
+                        //displayBoard(board);
                         printf("\n\n");
                         count=count+1;
                         if(!checkResult(board))
                            break;
                         clock_t begin = clock();
-                        printf("start time: %lf\n",begin);
+                        start=(double) begin / CLOCKS_PER_SEC;
+                        //printf("start time: %.10f\n",start);
+                        sleep(1);
                         m=TreeSearch(board);
                         if(m==1){
                             printf("Using Tree\n");
@@ -338,10 +341,11 @@ void main(){
                             memcpy(traverse->s,board,sizeof board);
                         }
                         clock_t end = clock();
-                        printf("end time: %lf\n",begin);
-                        t += (double)(end - begin) / CLOCKS_PER_SEC;
-                        printf("total tiem: %lf\n",t);
+                        finish=(double) end / CLOCKS_PER_SEC;
+                        //printf("end time: %.10f\n",finish);
+                        t += finish-start-1;
                         displayBoard(board);
+                        printf("total tiem: %lf\n",t);
                         count=count+1;
                         if(!checkResult(board))
                            break;
