@@ -304,8 +304,8 @@ void main(){
     int count=1,gameCount=0;
     int n,m,choice;
     double t[100][2],start,finish;
-    FILE* file = fopen ("test1.txt", "r");
-    FILE* o_file = fopen ("output2.txt", "w");
+    FILE* file = fopen ("test3.txt", "r");
+    FILE* o_file = fopen ("output2.3.txt", "w");
     printf("Welcome to the Unbeatable TIC TAC TOE Game....\nTry your luck and try to beat the Computer...\n\n");
     while(1){
         gameCount++;

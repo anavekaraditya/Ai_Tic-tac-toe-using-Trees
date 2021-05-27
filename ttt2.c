@@ -31,12 +31,12 @@ int AddNode(char board[3][3]){
     for(int i=0;i<3;i++)
         for(int j=0;j<3;j++)
             newchild->b[i][j]=board[i][j];
-    if(traverse2->left == NULL){
+    if(traverse2->left == NULL){  //if the level of tree has no nodes
         traverse2->left= newchild;
         traverse = newchild;
         printf("Added at the start\n");
     }
-    else{
+    else{                       // if the level of tree has existing nodes
         traverse3->right = newchild;
         traverse = newchild;
         printf("Added at the end\n");
@@ -48,6 +48,7 @@ int TreeSearch(char board[3][3]){
     traverse3 = traverse;
     traverse2 = traverse;
     traverse=traverse->left;
+    //Search for the board
     while(traverse!=NULL){
         int flag=0;
         for(int i=0;i<3;i++)
@@ -55,15 +56,17 @@ int TreeSearch(char board[3][3]){
                 if(traverse->b[i][j]!=board[i][j])
                     flag=1;
         if(flag==0){
+            // If found
             return 1;
         }
         else
         {
+            //if not found
             traverse3 = traverse;
             traverse=traverse->right;
         }
     }
-    return AddNode(board);
+    return AddNode(board); //Calls function to Add new node in the tree
 }
 
 
@@ -177,18 +180,12 @@ int minimax(char board[3][3], int depth, bool isMax)
 {
     int score = evaluate(board);
 
-    // If Maximizer has won the game return his/her
-    // evaluated score
     if (score == 10)
         return score;
 
-    // If Minimizer has won the game return his/her
-    // evaluated score
     if (score == -10)
         return score;
 
-    // If there are no more moves and no winner then
-    // it is a tie
     if (isMovesLeft(board)==false)
         return 0;
 
@@ -208,8 +205,6 @@ int minimax(char board[3][3], int depth, bool isMax)
                     // Make the move
                     board[i][j] = computer;
 
-                    // Call minimax recursively and choose
-                    // the maximum value
                     best = max( best, minimax(board, depth+1, !isMax) );
 
                     // Undo the move
@@ -235,8 +230,6 @@ int minimax(char board[3][3], int depth, bool isMax)
                     // Make the move
                     board[i][j] = human;
 
-                    // Call minimax recursively and choose
-                    // the minimum value
                     best = min(best,minimax(board, depth+1, !isMax));
 
                     // Undo the move
@@ -256,9 +249,7 @@ struct Move findBestMove(char board[3][3])
     bestMove.row = -1;
     bestMove.col = -1;
 
-    // Traverse all cells, evaluate minimax function for
-    // all empty cells. And return the cell with optimal
-    // value.
+
     for (int i = 0; i<3; i++)
     {
         for (int j = 0; j<3; j++)
@@ -276,9 +267,6 @@ struct Move findBestMove(char board[3][3])
                 // Undo the move
                 board[i][j] = ' ';
 
-                // If the value of the current move is
-                // more than the best value, then update
-                // best/
                 if (moveVal > bestVal)
                 {
                     bestMove.row = i;
@@ -328,7 +316,7 @@ void main(){
                         clock_t begin = clock();
                         start=(double) begin / CLOCKS_PER_SEC;
                         //printf("start time: %.10f\n",start);
-                        sleep(1);
+                        //sleep(1);
                         m=TreeSearch(board);
                         if(m==1){
                             printf("Using Tree\n");
@@ -343,7 +331,7 @@ void main(){
                         clock_t end = clock();
                         finish=(double) end / CLOCKS_PER_SEC;
                         //printf("end time: %.10f\n",finish);
-                        t += finish-start-1;
+                        t += finish-start;
                         displayBoard(board);
                         printf("total tiem: %lf\n",t);
                         count=count+1;
